@@ -26,7 +26,9 @@ def home():
 @app.route('/add-dumy')
 def add_dumy():
     hero =Hero(name='Mojo Jojo',super_name='Crazy Ape')
-    
+    db.session.add(hero)
+    db.session.commit()
+    return
     return
 
 if __name__ == '__main__':
