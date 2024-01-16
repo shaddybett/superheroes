@@ -23,6 +23,11 @@ db.init_app(app)
 def home():
     return ''
 
+@app.route('/add-dumy')
+def add_dumy():
+    hero =Hero(name='Mojo Jojo',super_name='Crazy Ape')
+    
+    return
 
 if __name__ == '__main__':
     app.run(port=5555)
