@@ -29,7 +29,7 @@ allheros= [
     {"name": "Jean Grey", "super_name": "Dark Phoenix"},
     {"name": "Ororo Munroe", "super_name": "Storm"},
     {"name": "Kitty Pryde", "super_name": "Shadowcat"},
-    {"name": "Elektra Natchios", "super_name": "Elektra"},
+    {"name": "Elektra Natchios", "super_name": "Elektra"}
 ]
 
 @app.route('/')
