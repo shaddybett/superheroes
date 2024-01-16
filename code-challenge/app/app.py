@@ -10,7 +10,7 @@ import os
 abs_path=os.getcwd()
 
 abs_python_path=os.path.normpath(abs_path)
-db_path=f'sqlite:///{abs_path}/db/app.db'
+db_path=f'sqlite:///{abs_python_path}/db/app.db'
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = db_path
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -19,7 +19,7 @@ migrate = Migrate(app, db)
 
 db.init_app(app)
 
-allheros= [
+allheroes= [
     {"name": "Kamala Khan", "super_name": "Ms. Marvel"},
     {"name": "Doreen Green", "super_name": "Squirrel Girl"},
     {"name": "Gwen Stacy", "super_name": "Spider-Gwen"},
@@ -34,10 +34,11 @@ allheros= [
 
 @app.route('/')
 def home():
-    return ''
+    return 'Welcome!'
+
 @app.route('/heroes')
 def heroes():
-    return jsonify(allheros)
+    return jsonify(allheroes)
 
 
 
@@ -49,4 +50,4 @@ def add_dumy():
     return "Hero added"
 
 if __name__ == '__main__':
-    app.run(port=3000,debug=True)
+    app.run(port=3001,debug=True)
