@@ -3,6 +3,7 @@ from flask import Flask, make_response, jsonify, request
 from flask_migrate import Migrate
 from models import db, Hero, Power, HeroPower
 import os
+from wtforms import Form, StringField, validators
 
 abs_path = os.getcwd()
 db_path = f"{abs_path}/db/app.db"
@@ -93,41 +94,53 @@ def get_or_update_power(power_id):
                 jsonify({"errors": ["Missing 'description' in request"]}), 400
             )
 
+
+class HeroPowerForm(Form):
+    strength = StringField('Strength', [validators.DataRequired()])
 @app.route("/hero_powers", methods=["POST"])
 def create_hero_power():
-    data = request.get_json()
+        form = HeroPowerForm(request.form)
 
-    if not all(key in data for key in ["strength", "power_id", "hero_id"]):
-        return make_response(
-            jsonify({"errors": ["Missing required fields in request"]}), 400
-        )
+        if form.validate():
+            
 
-    hero = Hero.query.get(data["hero_id"])
+            data = request.get_json()
 
-    if not hero:
-        return make_response(jsonify({"error": "Hero not found"}), 404)
+            if not all(key in data for key in ["strength", "power_id", "hero_id"]):
+                return make_response(
+                    jsonify({"errors": ["Missing required fields in request"]}), 400
+                )
 
-    new_hero_power = HeroPower(
-        strength=data["strength"], power_id=data["power_id"], hero_id=data["hero_id"]
-    )
+            hero = Hero.query.get(data["hero_id"])
 
-    db.session.add(new_hero_power)
-    db.session.commit()
+            if not hero:
+                return make_response(jsonify({"error": "Hero not found"}), 404)
 
-    # Instead of directly returning the result of get_hero_by_id, construct a JSON-friendly response
-    hero_data = {
-        "id": hero.id,
-        "name": hero.name,
-        "super_name": hero.super_name,
-        "powers": [
-            {"id": power.id, "name": power.name, "description": power.description}
-            for power in hero.powers
-        ]
-        if hasattr(hero, "powers")
-        else [],
-    }
+            new_hero_power = HeroPower(
+                strength=data["strength"], power_id=data["power_id"], hero_id=data["hero_id"]
+            )
+
+            db.session.add(new_hero_power)
+            db.session.commit()
+
+            # Instead of directly returning the result of get_hero_by_id, construct a JSON-friendly response
+            hero_data = {
+                "id": hero.id,
+                "name": hero.name,
+                "super_name": hero.super_name,
+                "powers": [
+                    {"id": power.id, "name": power.name, "description": power.description}
+                    for power in hero.powers
+                ]
+                if hasattr(hero, "powers")
+                else [],
+            }
     
-    return jsonify(hero_data)
+            return jsonify(hero_data)
+        else:
+            return make_response(
+                jsonify({"errors": form.errors}), 400
+            )
 
 if __name__ == "__main__":
     app.run(port=3001, debug=True)
