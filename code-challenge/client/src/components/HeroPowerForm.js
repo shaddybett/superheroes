@@ -8,6 +8,7 @@ function HeroPowerForm() {
   const [powerId, setPowerId] = useState("");
   const [strength, setStrength] = useState("");
   const [formErrors, setFormErrors] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false); // Add loading state
   const history = useHistory();
 
   useEffect(() => {
@@ -17,6 +18,7 @@ function HeroPowerForm() {
   }, []);
 
   useEffect(() => {
+    console.log("Fetching powers");
     fetch("/powers")
       .then((r) => r.json())
       .then(setPowers);
@@ -24,24 +26,29 @@ function HeroPowerForm() {
 
   function handleSubmit(e) {
     e.preventDefault();
+    setIsSubmitting(true); // Set loading state
+
     const formData = {
       hero_id: heroId,
       power_id: powerId,
       strength,
     };
+
     fetch("/hero_powers", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(formData),
-    }).then((r) => {
-      if (r.ok) {
-        history.push(`/heroes/${heroId}`);
-      } else {
-        r.json().then((err) => setFormErrors(err.errors));
-      }
-    });
+    })
+      .then((r) => {
+        if (r.ok) {
+          history.push(`/heroes/${heroId}`);
+        } else {
+          return r.json().then((err) => setFormErrors(err.errors));
+        }
+      })
+      .finally(() => setIsSubmitting(false)); // Reset loading state
   }
 
   return (
@@ -82,14 +89,15 @@ function HeroPowerForm() {
         value={strength}
         onChange={(e) => setStrength(e.target.value)}
       />
-      {formErrors.length > 0
-        ? formErrors.map((err) => (
-            <p key={err} style={{ color: "red" }}>
-              {err}
-            </p>
-          ))
-        : null}
-      <button type="submit">Add Hero Power</button>
+      {formErrors.length > 0 &&
+        formErrors.map((err) => (
+          <p key={err} style={{ color: "red" }}>
+            {err}
+          </p>
+        ))}
+      <button type="submit" disabled={isSubmitting}>
+        {isSubmitting ? "Adding Hero Power..." : "Add Hero Power"}
+      </button>
     </form>
   );
 }
