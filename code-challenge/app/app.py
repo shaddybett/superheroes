@@ -4,6 +4,10 @@ from flask_migrate import Migrate
 from models import db, Hero, Power, HeroPower
 import os
 from wtforms import Form, StringField, validators
+from flask_cors import CORS
+
+
+
 
 abs_path = os.getcwd()
 db_path = f"{abs_path}/db/app.db"
@@ -11,7 +15,7 @@ db_path = f"{abs_path}/db/app.db"
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
+CORS(app)
 migrate = Migrate(app, db)
 
 db.init_app(app)

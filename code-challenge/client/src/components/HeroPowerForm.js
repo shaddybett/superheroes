@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 
@@ -19,6 +18,7 @@ function HeroPowerForm() {
   }, []);
 
   useEffect(() => {
+    console.log("Fetching powers");
     fetch("/powers")
       .then((r) => r.json())
       .then(setPowers);
