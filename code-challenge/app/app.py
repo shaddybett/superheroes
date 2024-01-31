@@ -93,7 +93,6 @@ def get_or_update_power(power_id):
                 jsonify({"errors": ["Missing 'description' in request"]}), 400
             )
 
-
 @app.route("/hero_powers", methods=["POST"])
 def create_hero_power():
     data = request.get_json()
@@ -115,9 +114,20 @@ def create_hero_power():
     db.session.add(new_hero_power)
     db.session.commit()
 
-    return jsonify(get_hero_by_id(data["hero_id"]))
-
-
+    # Instead of directly returning the result of get_hero_by_id, construct a JSON-friendly response
+    hero_data = {
+        "id": hero.id,
+        "name": hero.name,
+        "super_name": hero.super_name,
+        "powers": [
+            {"id": power.id, "name": power.name, "description": power.description}
+            for power in hero.powers
+        ]
+        if hasattr(hero, "powers")
+        else [],
+    }
+    
+    return jsonify(hero_data)
 
 if __name__ == "__main__":
     app.run(port=3001, debug=True)
